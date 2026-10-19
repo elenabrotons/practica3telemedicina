@@ -583,6 +583,8 @@ app.get("/api/recursos/:id/resenyas", async function (req, res) {
 // INICIO DEL SERVIDOR
 // Render asigna el puerto en process.env.PORT
 
-app.listen(process.env.PORT || 3000, function () {
+var servidor = app.listen(process.env.PORT || 3000, function () {
     console.log("Servidor en marcha");
 });
+
+ws.iniciar(servidor);
