@@ -1,0 +1,282 @@
+/*  CONFIGURACION GENERAL 
+Estilo base de la pagina:
+   - Fuente legible
+   - Fondo blanco
+   - Margen para centrar y separar el contenido
+   - Color de texto por defecto  */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    margin: 40px;
+    color: #333;
+}
+
+
+/* VISIBILIDAD DE PANTALLAS:
+   - .seccion esta oculta por defecto
+   - .activa se aplica a la seccion visible
+   JavaScript anyade/quita la clase 'activa' para cambiar de pantalla */
+
+.seccion{display: none;}
+.activa{display: block;}
+
+
+/* COLORES ESTADO DE RESERVA TABLA RESERVAS:
+   - finalizada (blanco)
+   - en uso dentro del tiempo estimado (azul)
+   - en uso excediendo el tiempo estimado (rojo)
+   - pendiente de inicio (verde) */
+
+.reserva-finalizada { 
+    background-color: white; 
+}
+
+.reserva-en-uso { 
+    background-color: #add8e6; /* Azul claro */
+}
+
+.reserva-excedida { 
+    background-color: #ffcccc; /* Rojo claro */
+}
+
+.reserva-pendiente { 
+    background-color: #ccffcc; /* Verde claro */
+}
+
+
+/* CONTENEDOR PRINCIPAL DE CADA PANTALLA:
+   - Borde negro como marco
+   - Anchura maxima para que no se estire demasiado
+   - Centrado horizontal y separacion vertical */
+
+.seccion {
+    border: 2px solid #000;
+    max-width: 700px;
+    margin: 0 auto 30px auto;
+    background-color: #fff;
+}
+
+
+/*  ENCABEZADOS 
+
+Encabezado principal (h1):
+Franja gris superior con borde inferior para diferenciar secciones */
+.seccion h1 {
+    background-color: #b0b0b0; /* Gris del encabezado */
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    font-size: 22px;
+    border-bottom: 2px solid #000;
+    text-transform: none;
+    color: #000;
+}
+
+/* Encabezados secundarios (h2):
+   Titulo de subsecciones como busqueda, recursos, reservas, resenyas */
+.seccion h2 {
+    padding-left: 15px;
+    font-size: 18px;
+    border-bottom: 1px solid #ccc;
+    margin-top: 20px;
+    color: #000;
+}
+
+
+/* FORMULARIOS Y PARRAFOS 
+   - Cada <p> actua como fila usando flexbox
+   - label tiene ancho fijo para alinear todos los campos
+   - inputs y selects crecen para ocupar el espacio restante */
+
+.seccion p {
+    padding: 8px 25px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+label {
+    width: 130px; /* Alineacion de etiquetas */
+    font-weight: bold;
+    color: #000080; /* Azul oscuro */
+}
+
+input[type="text"], 
+input[type="password"], 
+select {
+    padding: 3px;
+    border: 1px solid #777;
+    flex-grow: 1;
+    max-width: 300px;
+}
+
+
+/*  BOTONES 
+    - Color neutro y borde
+    - Cambia de color al pasar el raton para feedback visual */
+
+button {
+    background-color: #e1e1e1;
+    border: 1px solid #888;
+    padding: 4px 12px;
+    margin: 10px 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #d0d0d0;
+}
+
+
+/* TABLAS DE RECURSOS, RESERVAS Y RESENYAS
+    - Bordes visibles
+    - Cabecera en gris claro
+    - Disenyo compacto y centrado */
+
+table {
+    width: 95%;
+    margin: 15px auto;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #999;
+    padding: 6px;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background-color: #f0f0f0;
+}
+
+
+/* COLORES DE AVISOS WEBSOCKET (Parte 3):
+   - Aviso de reserva iniciada/finalizada (rojo)
+   - Aviso de nuevo recurso creado (azul)
+   - Aviso de nueva resenya (verde) */
+
+.aviso-rojo {
+    background-color: #ffcccc; /* Rojo claro */
+}
+
+.aviso-azul {
+    background-color: #add8e6; /* Azul claro */
+}
+
+.aviso-verde {
+    background-color: #ccffcc; /* Verde claro */
+}
+
+/* ADAPTACION A MOVIL (pantallas de hasta 600px) */
+
+@media (max-width: 600px) {
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+    }
+
+    .seccion {
+        border: none;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    /* Formularios en vertical */
+    .seccion p {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+    }
+
+    label {
+        width: 100%;
+        margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    select {
+        width: 100%;
+        max-width: none;
+        min-height: 40px;
+        font-size: 16px; /* evita el zoom automatico de iOS */
+    }
+
+    /* Botones comodos para el dedo */
+    button {
+        min-height: 40px;
+        padding: 6px 16px;
+        margin: 6px 4px;
+    }
+
+    /* Tablas como tarjetas */
+    table, tbody, tr, td {
+        display: block;
+        width: 100%;
+    }
+
+    table {
+        width: calc(100% - 24px);
+        margin: 12px;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tr {
+        border: 1px solid #999;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        padding: 6px;
+    }
+
+    td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        border: none;
+        /* Línea gris muy suave y disimulada */
+        border-bottom: 1px solid #eeeeee;
+        padding: 6px 4px;
+        text-align: right;
+    }
+
+    /* Quita la línea del último dato para que no choque con el borde de la tarjeta */
+    td:last-child {
+        border-bottom: none;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-align: left;
+        flex-shrink: 0;
+    }
+
+    /* Botones Abrir / Borrar: lado a lado, sin etiqueta */
+    tr:has(td.accion) {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    td.accion {
+        flex: 1 1 45%;
+        width: auto;
+        justify-content: center;
+    }
+
+    td.accion::before {
+        display: none;
+    }
+
+    td.accion button {
+        width: 100%;
+    }
+}

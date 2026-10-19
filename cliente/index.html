@@ -1,0 +1,246 @@
+<!-- APLICACION WEB DEL GESTOR
+     Interfaz cliente desarrollada en HTML.
+     Todas las secciones estan en la misma pagina y se muestran/ocultan dinamicamente mediante JavaScript.
+     La comunicacion con el servidor se realiza mediante servicios REST asincronos. -->
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Recursos </title>
+    <link rel="stylesheet" href="estilos.css"> <!-- Para vincular el html con el css del estilo -->
+</head>
+
+<body>
+    <!-- SECCION LOGIN
+     Pantalla inicial de acceso del gestor.
+     Permite autenticarse mediante usuario y contrasenya.
+     Si el login es correcto se accede a la seccion "inicio". -->
+
+    <div id="login_gestor" class="seccion activa">
+        <h1>Acceso</h1>
+        <p><label for="usuario">Usuario: </label><br><input id="usuario" type="text" /></p>
+        <p><label for="password">Contrasenya: </label><br><input type="password" id="password"/></p>
+        <p>
+            <button onclick="entrar()">Entrar</button> <!-- Lleva a la seccion "inicio" si la validacion es correcta, mediante funcion JS entrar() -->
+            <button onclick="registrar()">Registrarse</button> <!-- Lleva a la seccion "registro_gestor" -->
+        </p>
+    </div>
+
+    <!-- SECCION REGISTRO / EDICION DE DATOS DEL GESTOR
+     Permite registrar un nuevo gestor o editar los datos de uno existente.
+     Se reutiliza la misma vista para registro y edicion. -->
+
+    <div id="registro_gestor" class="seccion">
+        <h1>Datos gestor</h1>
+        <p><label for="nombre">Nombre: </label><br><input id="nombre" type="text" /></p>
+        <p><label for="apellidos">Apellidos: </label><br><input id="apellidos" type="text" /></p>        
+        <p><label for="reg_usuario">Login: </label><br><input id="reg_usuario" type="text" /></p>
+        <p><label for="reg_password">Contrasenya: </label><br><input id="reg_password" type="password"/></p>
+        <p>
+            <button onclick="guardar()">Guardar</button> <!-- Llama a la funcion JS guardar() que comprueba si es edicion o registro y hace validaciones correspondientes -->
+            <button onclick="cancelar()">Cancelar</button> <!-- Vuelve a la seccion anterior: "login_gestor" o "inicio" -->
+        </p>
+    </div>
+
+    <!-- SECCION PRINCIPAL (INICIO)
+     Vista principal tras autenticacion.Contiene:
+     - Mensaje de bienvenida
+     - Filtros de busqueda
+     - Tabla de recursos
+     - Opciones para anyadir, editar o eliminar recursos -->
+
+    <div id="inicio" class="seccion">
+        <h1>Inicio</h1>
+        <p>
+            Bienvenido/a&nbsp; <!-- espacio especial que evita que el navegador haga un salto de linea ahi -->
+            <span id="inicio_usuario"></span> <!-- Span sirve para contener texto o elementos pequenyos. Se llena desde el main -->
+            <button onclick="editar_datos()">Editar datos</button> <!-- Lleva a seccion "registro_gestor" -->
+        </p>
+
+        <!-- Filtros dinamicos para buscar recursos. 
+             Se envian como parametros query al servidor REST. -->
+
+        <h2>Busqueda de recursos</h2> <!-- Tienen marcados selected "Todos" por defecto desde el main -->
+        
+        <!-- Select que se rellena dinamicamente con categorias en cargarRecursos() del main -->
+        <p>
+            <label for="filtro_categoria">Categoria:</label>
+            <select id="filtro_categoria"></select>
+        </p>
+        
+        <!-- Select que se rellena dinamicamente, con modelos filtrados segun su categoria, en cargarRecursos() del main -->
+        <p>
+            <label for="filtro_modelo">Modelo:</label>
+            <select id="filtro_modelo"></select>
+        </p>
+        
+        <!-- Select que se rellena dinamicamente con ubicaciones en cargarRecursos() del main -->
+        <p>
+            <label for="filtro_ubicacion">Ubicacion:</label>
+            <select id="filtro_ubicacion"></select>
+        </p>
+        
+        <!-- Select con estados predefinidos -->
+        <p>
+            <label for="filtro_estado">Estado:</label>
+            <select id="filtro_estado">
+                <option value="" selected>Todos</option> <!-- Se establece como selected por defecto -->
+                <option value="0" >Operativo</option>
+                <option value="1" >De baja o defectuoso</option>
+                <option value="2" >En mantenimiento</option>   
+            </select>
+        </p>
+
+        <!-- Llama a la funcion JS del main que utiliza el GET de recursos filtrados
+        y rellena las filas de la tabla dinamicamente con los recursos que cumplen dichos filtros -->
+        <p><button onclick="buscar()">Buscar</button></p>
+
+        <h2>Recursos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>N. Serie</th>
+                    <th>Categoria</th>
+                    <th>Modelo</th>
+                    <th>Ubicacion</th>
+                    <th>Estado</th>
+                    <th></th> <!-- Para el boton Abrir: verRecurso(id) -->
+                    <th></th> <!-- Para el boton Borrar: borrarRecurso(id) -->
+                </tr>
+            </thead>
+            <tbody id="tabla_recursos"></tbody> <!-- Filas generadas por JS -->
+        </table> 
+        
+        <p><button onclick="anyadir_recurso()">Anyadir Recurso</button></p> <!-- Boton para crear un nuevo recurso. Cambia seccion a "recurso" -->
+        
+        <h2>Ministerio de Sanidad</h2>
+
+        <p>
+            <button onclick="enviarReservasMinisterio()">
+                Enviar reservas al Ministerio
+            </button>
+        </p>
+
+        <h3>Ranking de reservas por área médica</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Posición</th>
+                    <th>Área médica</th>
+                    <th>Número de reservas</th>
+                </tr>
+            </thead>
+            <tbody id="tabla_ranking"></tbody>
+        </table>
+
+        <h3>Avisos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Origen</th>
+                    <th>Texto</th>
+                </tr>
+            </thead>
+            <tbody id="tabla_avisos">
+            </tbody>
+        </table>
+        
+        <p><button onclick="salir()">Salir</button></p> <!-- Cambia a seccion "login_gestor" -->
+    </div>
+
+    <!-- SECCIoN DETALLE DE RECURSO
+     Permite:
+     - Crear un nuevo recurso
+     - Editar un recurso existente
+     - Visualizar reservas asociadas
+     - Visualizar resenyas asociadas -->
+
+    <div id="recurso" class="seccion">
+        <h1>Recurso</h1>
+
+        <!-- Formulario de edicion del recurso.
+        Los selects se rellenan dinamicamente con datos obtenidos del servidor; cargarRecursosSelect() -->
+        <h2>Datos recurso</h2>
+        <p>
+            <label for="rec_categoria">Categoria:</label>
+            <select id="rec_categoria"></select>
+        </p>
+
+        <p>
+            <label for="rec_modelo">Modelo:</label>
+            <select id="rec_modelo"></select>
+        </p>
+
+        <p>
+            <label for="rec_numSerie">Num. Serie:</label>
+            <input id="rec_numSerie" type="text" />
+        </p>
+
+        <p>
+            <label for="rec_ubicacion">Ubicacion:</label>
+            <select id="rec_ubicacion"></select>
+        </p>
+
+        <p>
+            <label for="rec_estado">Estado:</label>
+            <select id="rec_estado">
+                <option value="0" >Operativo</option>
+                <option value="1" >De baja o defectuoso</option>
+                <option value="2" >En mantenimiento</option>   
+            </select>
+        </p>
+
+        <p>
+            <!-- Actualiza o crea un nuevo recurso mediante JS -->
+            <button onclick="guardar_recurso()">Guardar</button>
+        </p>
+        
+
+        <h2>Reservas</h2>
+        <!-- Tabla de reservas asociadas al recurso.
+        Las filas se generan dinamicamente mediante cargarTablasDetalle(id)
+        Se cargan desde el servidor mediante GET /api/recursos/:id/reservas
+        El color de cada fila depende del estado temporal
+        de la reserva (pendiente, en uso, finalizada, excedida). -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Sanitario</th>
+                    <th>H. estim.</th>
+                    <th>F. Peticion</th>
+                    <th>F. Inicio</th>
+                    <th>F. Fin</th>
+                </tr>
+            </thead>
+            <tbody id="tabla_reservas"></tbody> <!-- filas desde JS -->
+        </table>
+
+        <h2>Resenyas</h2>
+        <!-- Tabla de resenyas asociadas al recurso.
+        Las filas se generan dinamicamente mediante cargarTablasDetalle(id)
+        Se cargan desde el servidor mediante GET /api/recursos/:id/resenyas -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Sanitario</th>
+                    <th>Valoracion</th>
+                    <th>Comentario</th>
+                </tr>
+            </thead>
+            <tbody id="tabla_resenyas"></tbody> <!-- filas desde JS -->
+        </table>
+
+        <!-- Cambia a la seccion "inicio"-->
+        <p><button onclick="volver_listado()">Volver al listado</button></p>
+    </div>
+
+    <script src="rest.js"></script> <!-- rest.js: libreria auxiliar para realizar peticiones REST -->
+    <script src="main.js"></script> <!-- main.js: logica de la aplicacion cliente -->
+
+</body>
+</html>
