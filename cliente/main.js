@@ -881,12 +881,10 @@ async function cargarRankingMinisterio(){
                     !categoria.trim() ||
                     typeof reserva.fec_pet !== "string" ||
                     !reserva.fec_pet.trim() ||
+                    Number.isNaN(Date.parse(reserva.fec_pet)) ||
                     reserva.horas_estimadas == null ||
                     !Number.isFinite(Number(reserva.horas_estimadas)) ||
-                    Number(reserva.horas_estimadas) <= 0 ||
-                    !reserva.fec_pet.includes(":") ||  // Comprobar que las fechas tengan hora
-                    (reserva.fec_ini != null && !String(reserva.fec_ini).includes(":")) ||
-                    (reserva.fecha_fin != null && !String(reserva.fecha_fin).includes(":"))
+                    Number(reserva.horas_estimadas) <= 0)
                 ){
                     continue;
                 }
