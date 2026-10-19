@@ -1,38 +1,39 @@
 var WebSocket = require("ws");
-var conexion = require("./conexion_mysql.js");
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(
+    process.env.SUPABASE_URL || 'https://TU-PROYECTO.supabase.co',
+    process.env.SUPABASE_KEY || 'TU_ANON_KEY'
+);
 
 var clientes = new Map(); //guardar los clientes conectados
 /**
     clientes.set(ws, {
         tipo: "sanitario",
         id: 2,
-        nombre: "MarÌa GÛmez"
+        nombre: "Mar√≠a G√≥mez"
     });
  */
 
 // ================= FUNCIONES AUXILIARES =================
-// Ahora son asincronas: reciben un callback porque consultan MySQL
+// Ahora son asincronas: reciben un callback porque consultan Supabase
 
 function obtenerNombreCategoria(idRecurso, callback) {
-    var sqlRecurso = "SELECT * FROM recursos WHERE id = " + parseInt(idRecurso);
 
-    conexion.query(sqlRecurso, function (err, recursos_encontrados) {
+    supabase.from("recursos").select("*").eq("id", parseInt(idRecurso)).then(function ({ data: recursos_encontrados, error: err }) {
         if (err || recursos_encontrados.length == 0) {
             return callback("Desconocido");
         }
 
         var idModelo = recursos_encontrados[0].modelo;
-        var sqlModelo = "SELECT * FROM modelos WHERE id = " + parseInt(idModelo);
 
-        conexion.query(sqlModelo, function (err, modelos_encontrados) {
+        supabase.from("modelos").select("*").eq("id", parseInt(idModelo)).then(function ({ data: modelos_encontrados, error: err }) {
             if (err || modelos_encontrados.length == 0) {
                 return callback("Desconocido");
             }
 
             var idCat = modelos_encontrados[0].cat;
-            var sqlCat = "SELECT * FROM categorias WHERE id = " + parseInt(idCat);
 
-            conexion.query(sqlCat, function (err, categorias_encontradas) {
+            supabase.from("categorias").select("*").eq("id", parseInt(idCat)).then(function ({ data: categorias_encontradas, error: err }) {
                 if (err || categorias_encontradas.length == 0) {
                     return callback("Desconocido");
                 }
@@ -43,17 +44,15 @@ function obtenerNombreCategoria(idRecurso, callback) {
 }
 
 function obtenerNombreModelo(idRecurso, callback) {
-    var sqlRecurso = "SELECT * FROM recursos WHERE id = " + parseInt(idRecurso);
 
-    conexion.query(sqlRecurso, function (err, recursos_encontrados) {
+    supabase.from("recursos").select("*").eq("id", parseInt(idRecurso)).then(function ({ data: recursos_encontrados, error: err }) {
         if (err || recursos_encontrados.length == 0) {
             return callback("Desconocido");
         }
 
         var idModelo = recursos_encontrados[0].modelo;
-        var sqlModelo = "SELECT * FROM modelos WHERE id = " + parseInt(idModelo);
 
-        conexion.query(sqlModelo, function (err, modelos_encontrados) {
+        supabase.from("modelos").select("*").eq("id", parseInt(idModelo)).then(function ({ data: modelos_encontrados, error: err }) {
             if (err || modelos_encontrados.length == 0) {
                 return callback("Desconocido");
             }
@@ -63,9 +62,8 @@ function obtenerNombreModelo(idRecurso, callback) {
 }
 
 function obtenerNumSerie(idRecurso, callback) {
-    var sql = "SELECT numero_serie FROM recursos WHERE id = " + parseInt(idRecurso);
 
-    conexion.query(sql, function (err, recursos_encontrados) {
+    supabase.from("recursos").select("numero_serie").eq("id", parseInt(idRecurso)).then(function ({ data: recursos_encontrados, error: err }) {
         if (err || recursos_encontrados.length == 0) {
             return callback("Desconocido");
         }
@@ -74,7 +72,7 @@ function obtenerNumSerie(idRecurso, callback) {
 }
 
 function enviarMensaje(ws, mensaje) {
-    if (ws.readyState === WebSocket.OPEN) { //si la conexiÛn est· abierta
+    if (ws.readyState === WebSocket.OPEN) { //si la conexi√≥n est√° abierta
         ws.send(JSON.stringify(mensaje)); // convierte el objeto JavaScript en texto JSON
     }
 }
@@ -184,39 +182,45 @@ function avisarNuevaResenya(idRecurso, puntuacion, nombreOrigen) {
 
 // ================= WEBSOCKET =================
 
-var wss = new WebSocket.Server({ port: 8080 }); //crear el servidor websocket -> ws://localhost:8080
+// Render solo expone un puerto: el WebSocket se cuelga del servidor HTTP de Express.
+// Se llama desde servidor_rest.js con ws.iniciar(servidor)
+function iniciar(servidorHttp) {
 
-wss.on("connection", function(ws) { // cuando un cliente se conecta -> este evento se ejecuta cuando un navegador abre una conexiÛn websocket
-    console.log("Nueva conexion WebSocket");  // ws es esa conexiÛn concreta
+    var wss = new WebSocket.Server({ server: servidorHttp }); //crear el servidor websocket
 
-    ws.on("message", function(mensaje) { // se ejecuta cuando el cliente envÌa algo al servidor
-        var datos = JSON.parse(mensaje); // convertir el mensaje JSON a JavaScript
+    wss.on("connection", function(ws) { // cuando un cliente se conecta -> este evento se ejecuta cuando un navegador abre una conexi√≥n websocket
+        console.log("Nueva conexion WebSocket");  // ws es esa conexi√≥n concreta
 
-        // Evaluamos el tipo de operaciÛn enviada directo por el cable WS
-        switch(datos.tipo) { //seg˙n el tipo de mensaje que llega
-            case "registro":
-                clientes.set(ws, {  // el servidor guarda que ese socket pertenece a esa persona cone se id y nombre
-                    tipo: datos.rol,
-                    id: datos.id,
-                    nombre: datos.nombre
-                });
-                break;
-        }
+        ws.on("message", function(mensaje) { // se ejecuta cuando el cliente env√≠a algo al servidor
+            var datos = JSON.parse(mensaje); // convertir el mensaje JSON a JavaScript
+
+            // Evaluamos el tipo de operaci√≥n enviada directo por el cable WS
+            switch(datos.tipo) { //seg√∫n el tipo de mensaje que llega
+                case "registro":
+                    clientes.set(ws, {  // el servidor guarda que ese socket pertenece a esa persona cone se id y nombre
+                        tipo: datos.rol,
+                        id: datos.id,
+                        nombre: datos.nombre
+                    });
+                    break;
+            }
+        });
+
+        ws.on("close", function() { //si el usuario cierra la pesta√±a o se corta la conexi√≥n
+            clientes.delete(ws); // se elimina el socket de Map
+        });
+
+        ws.on("error", function() { //si hay un error en la conexi√≥n tmb se elimina del Map
+            clientes.delete(ws);
+        });
     });
 
-    ws.on("close", function() { //si el usuario cierra la pestaÒa o se corta la conexiÛn
-        clientes.delete(ws); // se elimina el socket de Map
-    });
-
-    ws.on("error", function() { //si hay un error en la conexiÛn tmb se elimina del Map
-        clientes.delete(ws);
-    });
-});
-
-console.log("Servidor WebSocket en marcha en el puerto 8080");
+    console.log("Servidor WebSocket en marcha");
+}
 
 // para utilizarlas en los servidores de los gestores o sanitarios
 module.exports = {
+    iniciar,
     avisarReserva,
     avisarNuevoRecurso,
     avisarNuevaResenya
