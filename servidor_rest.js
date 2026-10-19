@@ -5,8 +5,8 @@ var ws = require("./servidor_websocket");
 // Creamos la aplicacion del servidor
 var app = express();
 
-var jwt = require("jwt-simple");
-var clave = "laClaveSecreta";
+var jwt = require("jwt-simple"); // npm install jwt-simple antes
+var clave = "laClaveSecreta"; // para firmar y verificar los tokens
 
 // Importamos el cliente de Supabase
 const { createClient } = require('@supabase/supabase-js');
@@ -56,7 +56,7 @@ app.post("/api/gestores/login", async function (req, res) {
             expira: Date.now() + 60 * 60 * 1000 // caduca en una hora
         };
 
-        var token = jwt.encode(contenido, clave);
+        var token = jwt.encode(contenido, clave);  //genera el JWT firmado con nuestra clave 
 
         res.status(200).json({
             id: gestor_encontrado.id,
@@ -114,12 +114,13 @@ app.post("/api/gestores", async function (req, res) {
 });
 
 
-// COMPROBAR JWT
+
+// Middleware de autenticación que se ejecuta antes de los servicios REST protegidos
 // Todo lo que se define a partir de aqui exige token
 
 app.use("/api", function (req, res, next) {
 
-    var token = req.query.token;
+    var token = req.query.token; 
 
     if (!token) {
         res.status(401).json("No se ha encontrado token");
@@ -129,7 +130,7 @@ app.use("/api", function (req, res, next) {
     var contenidoToken;
 
     try {
-        contenidoToken = jwt.decode(token, clave);
+        contenidoToken = jwt.decode(token, clave); //lo decodificamos con la misma clave 
     } catch (error) {
         res.status(401).json("El token es incorrecto");
         return;
