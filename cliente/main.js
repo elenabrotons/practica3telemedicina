@@ -884,7 +884,7 @@ async function cargarRankingMinisterio(){
                     Number.isNaN(Date.parse(reserva.fec_pet)) ||
                     reserva.horas_estimadas == null ||
                     !Number.isFinite(Number(reserva.horas_estimadas)) ||
-                    Number(reserva.horas_estimadas) <= 0)
+                    Number(reserva.horas_estimadas) <= 0
                 ){
                     continue;
                 }
