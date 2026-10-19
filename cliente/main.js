@@ -550,7 +550,7 @@ function abrirWebSocket() {
         socketGestor.close();
     }
 
-    socketGestor = new WebSocket("ws://localhost:8080");
+    socketGestor = new WebSocket(location.protocol === "https:" ? "wss://" : "ws://") + location.host);
 
     socketGestor.onopen = function() { // Cuando la conexi�n WebSocket se abra correctamente, ejecuta esta funci�n
         // Nos registramos en el servidor WS como gestor
