@@ -551,8 +551,8 @@ function abrirWebSocket() {
     }
 
     socketGestor = new WebSocket(
-         (window.location.protocol === "https:" ? "wss://" : "ws://") +
-         window.location.host
+         (window.location.protocol === "https:" ? "wss://" : "ws://") + // obtiene si estamos utilizando http: o https; HTTPS -> wss://    HTTP -> ws://
+         window.location.host // obtiene el dominio y, cuando corresponde, el puerto de la aplicación
      );
 
     socketGestor.onopen = function() { // Cuando la conexi�n WebSocket se abra correctamente, ejecuta esta funci�n
