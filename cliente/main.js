@@ -862,7 +862,7 @@ async function cargarRankingMinisterio(){
 
             if(!Number.isInteger(id_area) ||
                id_area < 1 || id_area > 18 ||
-               !Array.isArray(area.datos)){
+               !Array.isArray(area?.datos)){
                 continue;
             }
 
@@ -953,46 +953,61 @@ async function cargarRankingMinisterio(){
             return;
         }
 
-        var envio;
-        
-        for (var i = 0; i < datos.length; i++){    
-            if (datos[i].id == 5226){
-                envio = datos[i];
-                break;
+        var suma = 0;
+        var contador = 0;
+
+        // Recorremos los registros del Ministerio
+        for(var i = 0; i < datos.length; i++){
+
+            var area = datos[i]; //datos de un post de un área en el servidor
+            var id_area = Number(area?.id_area); //?. permite acceder a id_area que dé error si area es null o undefined
+
+            if(!Number.isInteger(id_area) ||
+               id_area < 1 || id_area > 18 ||
+               !Array.isArray(area?.datos)){
+                continue;
+            }
+
+            if (Number(id_area) != 14){
+                continue;
+            }
+
+            // Recorremos las reservas de cada registro con id_area 14
+            for(var j = 0; j < area.datos.length; j++){
+
+                var reserva = area.datos[j];
+
+                if(!reserva){
+                    continue;
+                }
+
+                if(
+                    reserva.horas_estimadas == null ||
+                    !Number.isFinite(Number(reserva.horas_estimadas)) ||
+                    Number(reserva.horas_estimadas) <= 0
+                ){
+                    continue;
+                }
+
+                suma+= Number(reserva.horas_estimadas);
+                contador++;
             }
         }
 
-        if (!envio){
-            alert("No existe un envío con un id 5226");
-            return;
+        if(contador > 0){
+            var media = suma / contador;
+            console.log("La media de horas estimadas de Oncología es de " + media);
+        }else{
+            console.log("No hay reservas válidas de Oncología");
         }
 
-        var totales = 0;
-
-        //Recorro todas las reservas del envío
-        for (var j = 0; j < envio.datos.length; j++){
-            var reserva = envio.datos[j];
-            if (
-                reserva &&
-                "nombre" in reserva &&
-                "apellidos" in reserva &&
-                "categoría" in reserva &&
-                "horas_estimadas" in reserva &&
-                "fec_pet" in reserva &&
-                "fec_ini" in reserva &&
-                "fecha_fin" in reserva
-            ){
-                totales++;
-            }
-        }
-
-        console.log("El número de reservas válidas del envío son " + totales);
 
     } catch(err){
-        console.log("Error al obtener el ranking:", err);
+        console.log("Error al obtener la media:", err);
         alert("Error al conectar con el Ministerio");
     }
 }
+
 
 
 
