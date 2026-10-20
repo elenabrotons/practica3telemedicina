@@ -31,10 +31,10 @@ app.post("/api/gestores/login", async function (req, res) {
     var usuario_buscado = req.body.usuario;
     var password_buscado = req.body.password;
 
-    var { data: gestores_encontrados, error } = await supabase
+    var { data: gestores_encontrados, error } = await supabase //las operaciones son asíncronas
         .from("gestores")
         .select("*")
-        .eq("usu", usuario_buscado);
+        .eq("usu", usuario_buscado); // como el WHERE
 
     if (error) {
         console.log("Error al consultar el gestor:", error);
@@ -223,7 +223,7 @@ app.put("/api/gestores/:id", async function (req, res) {
         .from("gestores")
         .select("id")
         .eq("usu", datos.usuario)
-        .neq("id", id_gestor);
+        .neq("id", id_gestor);  //obtiene los que tengan un id_gestor distinto a ese id
 
     if (error_usuario) {
         console.log("Error al comprobar el usuario:", error_usuario);
@@ -370,7 +370,7 @@ app.get("/api/recursos", async function (req, res) {
     }
 
     // Quitamos el objeto "modelos" que anade el join
-    var recursos_encontrados = data.map(function (r) {
+    var recursos_encontrados = data.map(function (r) { //.map() recorre un array y crea otro array a partir de sus elementos
         return {
             id: r.id,
             modelo: r.modelo,
@@ -432,8 +432,8 @@ app.post("/api/recursos", async function (req, res) {
             numero_serie: datos_nuevos.numero_serie,
             estado: datos_nuevos.estado
         })
-        .select()
-        .single();
+        .select()  //pide que Supabase devuelva el registro insertado
+        .single(); //devuelve ese único registro como objeto, en lugar de un array
 
     if (error) {
         console.log("Error al crear el recurso:", error);
@@ -584,7 +584,7 @@ app.get("/api/recursos/:id/resenyas", async function (req, res) {
 // INICIO DEL SERVIDOR
 // Render asigna el puerto en process.env.PORT
 
-var servidor = app.listen(process.env.PORT || 3000, function () {
+var servidor = app.listen(process.env.PORT || 3000, function () { //obtiene el puerto proporcionado por el entorno de ejecución
     console.log("Servidor en marcha");
 });
 
