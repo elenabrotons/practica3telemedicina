@@ -598,6 +598,11 @@ function anyadirAviso(aviso) {
     tabla.innerHTML = fila + tabla.innerHTML;
 }
 
+// comparar fechas -> if (fecha1.substring(0,10) == fecha2.substring(0,10))
+// comparar fechas y horas -> if (new Date(fecha1).getTime() == new Date(fecha2).getTime())
+// comparar texto -> [.value].trim().toLowerCase()
+
+
 // +++++++++++++++++++++++++++++++++++++++ FIN BOTONES Y FUNCIONES DEL INICIO (+aspecto registro) +++++++++++++++++++++++++++++++++++++++
 
 
@@ -824,7 +829,7 @@ async function enviarReservasMinisterio(){
 
 
 // RANKING DE RESERVAS DEL MINISTERIO
-/*
+
 async function cargarRankingMinisterio(){
 
     try {
@@ -875,15 +880,13 @@ async function cargarRankingMinisterio(){
                     continue;
                 }
 
-                var categoria = reserva.categoría;
-
                 if(
                     typeof reserva.nombre !== "string" ||
                     !reserva.nombre.trim() ||
                     typeof reserva.apellidos !== "string" ||
                     !reserva.apellidos.trim() ||
-                    typeof categoria !== "string" ||
-                    !categoria.trim() ||
+                    typeof reserva.categoría !== "string" ||
+                    !reserva.categoría.trim() ||
                     typeof reserva.fec_pet !== "string" ||  //que sea cadena de texto
                     !reserva.fec_pet.trim() || // que no esté vacía
                     Number.isNaN(Date.parse(reserva.fec_pet)) || // que se interprete como fecha
@@ -934,79 +937,8 @@ async function cargarRankingMinisterio(){
         alert("Error al conectar con el Ministerio");
     }
 }
-*/
-
-async function cargarRankingMinisterio(){
-
-    try {
-        var respuesta = await fetch("https://undefined.ua.es/telemedicina/api/datos");
-
-        if(!respuesta.ok){
-            alert("Error al obtener los datos del Ministerio");
-            return;
-        }
-
-        var datos = await respuesta.json();
-
-        if(!Array.isArray(datos)){
-            alert("Formato incorrecto");
-            return;
-        }
-
-        var suma = 0;
-        var contador = 0;
-
-        // Recorremos los registros del Ministerio
-        for(var i = 0; i < datos.length; i++){
-
-            var area = datos[i]; //datos de un post de un área en el servidor
-            var id_area = Number(area?.id_area); //?. permite acceder a id_area que dé error si area es null o undefined
-
-            if(!Number.isInteger(id_area) ||
-               id_area < 1 || id_area > 18 ||
-               !Array.isArray(area?.datos)){
-                continue;
-            }
-
-            if (Number(id_area) != 14){
-                continue;
-            }
-
-            // Recorremos las reservas de cada registro con id_area 14
-            for(var j = 0; j < area.datos.length; j++){
-
-                var reserva = area.datos[j];
-
-                if(!reserva){
-                    continue;
-                }
-
-                if(
-                    reserva.horas_estimadas == null ||
-                    !Number.isFinite(Number(reserva.horas_estimadas)) ||
-                    Number(reserva.horas_estimadas) <= 0
-                ){
-                    continue;
-                }
-
-                suma+= Number(reserva.horas_estimadas);
-                contador++;
-            }
-        }
-
-        if(contador > 0){
-            var media = suma / contador;
-            console.log("La media de horas estimadas de Oncología es de " + media);
-        }else{
-            console.log("No hay reservas válidas de Oncología");
-        }
 
 
-    } catch(err){
-        console.log("Error al obtener la media:", err);
-        alert("Error al conectar con el Ministerio");
-    }
-}
 
 
 
