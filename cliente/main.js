@@ -824,7 +824,7 @@ async function enviarReservasMinisterio(){
 
 
 // RANKING DE RESERVAS DEL MINISTERIO
-
+/*
 async function cargarRankingMinisterio(){
 
     try {
@@ -934,8 +934,65 @@ async function cargarRankingMinisterio(){
         alert("Error al conectar con el Ministerio");
     }
 }
+*/
 
+async function cargarRankingMinisterio(){
 
+    try {
+        var respuesta = await fetch("https://undefined.ua.es/telemedicina/api/datos");
+
+        if(!respuesta.ok){
+            alert("Error al obtener los datos del Ministerio");
+            return;
+        }
+
+        var datos = await respuesta.json();
+
+        if(!Array.isArray(datos)){
+            alert("Formato incorrecto");
+            return;
+        }
+
+        var envio;
+        
+        for (var i = 0; i < datos.length; i++){    
+            if (datos[i].id == 5226){
+                envio = datos[i];
+                break;
+            }
+        }
+
+        if (!envio){
+            alert("No existe un envío con un id 5226");
+            return;
+        }
+
+        var totales = 0;
+
+        //Recorro todas las reservas del envío
+        for (var j = 0; j < envio.datos.length; j++){
+            var reserva = envio.datos[j];
+            if (
+                reserva &&
+                "nombre" in reserva &&
+                "apellidos" in reserva &&
+                "categoría" in reserva &&
+                "horas_estimadas" in reserva &&
+                "fec_pet" in reserva &&
+                "fec_ini" in reserva &&
+                "fecha_fin" in reserva
+            ){
+                totales++;
+            }
+        }
+
+        console.log("El número de reservas válidas del envío son " + totales);
+
+    } catch(err){
+        console.log("Error al obtener el ranking:", err);
+        alert("Error al conectar con el Ministerio");
+    }
+}
 
 
 
