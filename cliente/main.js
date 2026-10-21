@@ -970,7 +970,7 @@ async function contarRegistros(){
 
         var id_input = document.getElementById("id_area").value;
 
-        if (!Number.isInteger(id_input) || id_input < 1 || id_input > 18){
+        if (!Number.isInteger(Number(id_input)) || id_input < 1 || id_input > 18){
             alert("El id debe ser un número entre 1 y 18");
             return;
         }
