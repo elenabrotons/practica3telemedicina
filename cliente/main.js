@@ -1029,6 +1029,7 @@ async function contarReservas(){
         for(var i = 0; i < datos.length; i++){
 
             var area = datos[i]; //datos de un post de un área en el servidor
+            var id_area = Number(area?.id_area);
 
             if(!Number.isInteger(id_area) ||
                id_area < 1 || id_area > 18 ||
@@ -1049,8 +1050,8 @@ async function contarReservas(){
                     continue;
                 }
 
-                console.log(reserva.fecha_fin);
-                /*
+                
+                
                 if(
                     typeof reserva.fecha_fin !== "string" ||  //que sea cadena de texto
                     !reserva.fecha_fin.trim() || // que no esté vacía
@@ -1058,7 +1059,7 @@ async function contarReservas(){
                 ){
                     continue;
                 }
-                */
+                console.log(reserva.fecha_fin);
                 contador++;
             }
         }
