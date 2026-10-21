@@ -1045,6 +1045,8 @@ async function contarReservas(){
                     continue;
                 }
 
+                console.log(reserva.fecha_fin);
+
                 if(
                     typeof reserva.fecha_fin !== "string" ||  //que sea cadena de texto
                     !reserva.fecha_fin.trim() || // que no esté vacía
@@ -1052,7 +1054,7 @@ async function contarReservas(){
                 ){
                     continue;
                 }
-                console.log(reserva.fecha_fin);
+                
                 contador++;
             }
         }
