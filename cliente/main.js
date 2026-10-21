@@ -1052,8 +1052,7 @@ async function contarReservas(){
 
                 if(
                     typeof reserva.fecha_fin !== "string" ||  //que sea cadena de texto
-                    !reserva.fecha_fin.trim() || // que no esté vacía
-                    Number.isNaN(Date.parse(reserva.fecha_fin)) 
+                    reserva.fecha_fin =! null) 
                 ){
                     continue;
                 }
