@@ -1003,8 +1003,67 @@ async function contarRegistros(){
     }
 }
 
+// EJERCICIO 2 EXAMEN
 
+async function contarReservas(){
 
+    try {
+        var respuesta = await fetch("https://undefined.ua.es/telemedicina/api/datos");
+
+        if(!respuesta.ok){
+            alert("Error al obtener los datos del Ministerio");
+            return;
+        }
+
+        var datos = await respuesta.json();
+
+        if(!Array.isArray(datos)){
+            alert("Formato incorrecto");
+            return;
+        }
+
+        var mi_id_area = 14;
+        var contador = 0;
+
+        // Recorremos los registros del Ministerio
+        for(var i = 0; i < datos.length; i++){
+
+            var area = datos[i]; //datos de un post de un área en el servidor
+
+            if(!Number.isInteger(id_area) ||
+               id_area < 1 || id_area > 18 ||
+               !Array.isArray(area?.datos)){
+                continue;
+            }
+
+            // Recorremos las reservas de cada registro
+            for(var j = 0; j < area.datos.length; j++){
+
+                var reserva = area.datos[j];
+
+                if(!reserva){
+                    continue;
+                }
+
+                if(
+                    typeof reserva.fecha_fin !== "string" ||  //que sea cadena de texto
+                    !reserva.fecha_fin.trim() || // que no esté vacía
+                    Number.isNaN(Date.parse(reserva.fecha_fin)) // que se interprete como fecha
+                ){
+                    continue;
+                }
+
+                contador++;
+            }
+        }
+
+        alert("Existen " + contador + "reservas finalizadas");
+
+    } catch(err){
+        console.log("Error al obtener el ranking:", err);
+        alert("Error al conectar con el Ministerio");
+    }
+}
 
 
 
