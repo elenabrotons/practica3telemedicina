@@ -1050,16 +1050,14 @@ async function contarReservas(){
                     continue;
                 }
 
-                
-                
                 if(
                     typeof reserva.fecha_fin !== "string" ||  //que sea cadena de texto
                     !reserva.fecha_fin.trim() || // que no esté vacía
-                    reserva.fecha_fin == null 
+                    Number.isNaN(Date.parse(reserva.fecha_fin)) 
                 ){
                     continue;
                 }
-                console.log(reserva.fecha_fin);
+
                 contador++;
             }
         }
