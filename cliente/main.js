@@ -998,7 +998,7 @@ async function contarRegistros(){
         alert("Existen " + num_registros + " registros del área de " + nombre_area);
 
     } catch(err){
-        console.log("Error al obtener el ranking:", err);
+        console.log("Error al obtener el número de registros:", err);
         alert("Error al conectar con el Ministerio");
     }
 }
