@@ -1036,6 +1036,10 @@ async function contarReservas(){
                 continue;
             }
 
+            if (id_area != mi_id_area){
+                continue;
+            }
+
             // Recorremos las reservas de cada registro
             for(var j = 0; j < area.datos.length; j++){
 
@@ -1050,7 +1054,7 @@ async function contarReservas(){
                 if(
                     typeof reserva.fecha_fin !== "string" ||  //que sea cadena de texto
                     !reserva.fecha_fin.trim() || // que no esté vacía
-                    reserva.fecha_fin == null // que se interprete como fecha
+                    reserva.fecha_fin == null 
                 ){
                     continue;
                 }
