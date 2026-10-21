@@ -939,6 +939,70 @@ async function cargarRankingMinisterio(){
 }
 
 
+// EJERCICIO 1 EXAMEN
+
+async function contarRegistros(){
+
+    try {
+        var respuesta = await fetch("https://undefined.ua.es/telemedicina/api/datos");
+
+        if(!respuesta.ok){
+            alert("Error al obtener los datos del Ministerio");
+            return;
+        }
+
+        var datos = await respuesta.json();
+
+        if(!Array.isArray(datos)){
+            alert("Formato incorrecto");
+            return;
+        }
+
+        var nombresAreas = [
+            "",
+            "Alergología", "Anestesiología", "Cardiología",
+            "Cirugía General", "Dermatología", "Aparato Digestivo",
+            "Endocrinología", "Ginecología", "Hematología",
+            "Medicina Interna", "Neumología", "Neurología",
+            "Oftalmología", "Oncología", "Pediatría",
+            "Psiquiatría", "Traumatología", "Urología"
+        ];
+
+        var id_input = document.getElementById("id_area").value;
+
+        if (!Number.isInteger(id_input) || id_input < 1 || id_input > 18){
+            alert("El id debe ser un número entre 1 y 18");
+            return;
+        }
+
+        var nombre_area = nombresAreas[id_input];
+
+        var num_registros = 0;
+
+        // Recorremos los registros del Ministerio
+        for(var i = 0; i < datos.length; i++){
+
+            var area = datos[i]; //datos de un post de un área en el servidor
+            var id_area = Number(area?.id_area); //?. permite acceder a id_area que dé error si area es null o undefined
+
+            if(!Number.isInteger(id_area) ||
+               id_area < 1 || id_area > 18){
+                continue;
+            }
+
+            if (id_area == id_input){
+                num_registros++;
+            }
+        }
+
+        alert("Existen " + num_registros + " registros del área de " + nombre_area);
+
+    } catch(err){
+        console.log("Error al obtener el ranking:", err);
+        alert("Error al conectar con el Ministerio");
+    }
+}
+
 
 
 

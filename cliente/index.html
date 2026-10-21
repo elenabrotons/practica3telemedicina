@@ -26,6 +26,9 @@
             <button onclick="entrar()">Entrar</button> <!-- Lleva a la seccion "inicio" si la validacion es correcta, mediante funcion JS entrar() -->
             <button onclick="registrar()">Registrarse</button> <!-- Lleva a la seccion "registro_gestor" -->
         </p>
+
+        <p><label for="id_area">Id area: </label><br><input id="id_area" type="text" /></p>
+        <button onclick="contarRegistros()">Contar registros</button>
     </div>
 
     <!-- SECCION REGISTRO / EDICION DE DATOS DEL GESTOR
@@ -58,6 +61,13 @@
             <span id="inicio_usuario"></span> <!-- Span sirve para contener texto o elementos pequenyos. Se llena desde el main -->
             <button onclick="editar_datos()">Editar datos</button> <!-- Lleva a seccion "registro_gestor" -->
         </p>
+
+        <p>
+            <label for="categorias_lista">Categoria:</label>
+            <select id="categorias_lista"></select>
+            <button onclick="reservasCategoria()">Contar reservas</button>
+        </p>
+        <p id="resultado_categoria"></p>
 
         <!-- Filtros dinamicos para buscar recursos. 
              Se envian como parametros query al servidor REST. -->
@@ -198,7 +208,6 @@
             <!-- Actualiza o crea un nuevo recurso mediante JS -->
             <button onclick="guardar_recurso()">Guardar</button>
         </p>
-        
 
         <h2>Reservas</h2>
         <!-- Tabla de reservas asociadas al recurso.
